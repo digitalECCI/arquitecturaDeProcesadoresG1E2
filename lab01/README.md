@@ -101,9 +101,13 @@ module sumadorRestador(
     );
 
 endmodule
-
 ```
-        
+### Funcionamiento
+Las puertas `XOR` condicionan cada bit de B con la señal Sub.
+Si `Sub=1`, B se invierte (complemento a 1); el acarreo de entrada del primer sumador se fuerza a Sub, completando el complemento a 2.
+
+Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el resultado.
+
 #### 1.2 Diagramas
 
 

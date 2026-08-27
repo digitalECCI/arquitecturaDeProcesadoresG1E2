@@ -110,7 +110,9 @@ Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el 
 
 #### 1.2 Diagramas
 ![pic](imagenes/arquitectura.png)
-
+##### RTL dado por software Quartus para el Sumador de 4 bits
+![pic](imagenes/sumRestador.png)
+##### RTL dado por software Quartus para el Sumador/Restador
 ## Simulaciones 
 
 ### 1. Simulación del sumador/restador

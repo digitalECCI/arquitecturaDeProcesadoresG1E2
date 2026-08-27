@@ -109,7 +109,7 @@ Si `Sub=1`, B se invierte (complemento a 1); el acarreo de entrada del primer su
 Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el resultado.
 
 #### 1.2 Diagramas
-![pic](scr/imagenes/arquitectura.png)
+![pic](imagenes/arquitectura.png)
 
 ## Simulaciones 
 

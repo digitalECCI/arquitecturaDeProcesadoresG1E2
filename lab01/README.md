@@ -2,9 +2,9 @@
 # Lab01 - Sumador/Restador de 4 bits
 
 # Integrantes
-* [Paula Andrea Cortéz](<!-- Remplace aqui link de usario 1 de github -->) 
+* [Paula Andrea Cortéz](https://github.com/Cortes271) 
 * [Santiago Leonardo Molina Bogotá](https://github.com/SaintGao-cmd)
-* [Andrés Felipe Muñoz Martinez](<!-- Remplace aqui link de usario 3 de github -->) 
+* [Andrés Felipe Muñoz Martinez](https://github.com/Andresfmm2007) 
 * [Laura Ximena Rojas Pachon](https://github.com/LauXRS) 
 # Informe
 

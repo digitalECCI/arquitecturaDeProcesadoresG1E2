@@ -2,9 +2,10 @@
 # Lab01 - Sumador/Restador de 4 bits
 
 # Integrantes
-    * [<!-- Remplace aqui nombre 1. -->](<!-- Remplace aqui link de usario 1 de github -->) 
-    * [<!-- Remplace aqui nombre 2. -->](<!-- Remplace aqui link de usario 2 de github -->) 
-    * [<!-- Remplace aqui nombre 3. -->](<!-- Remplace aqui link de usario 3 de github -->) 
+* [Paula Andrea Cortéz](<!-- Remplace aqui link de usario 1 de github -->) 
+* [Santiago Leonardo Molina Bogotá](<!-- https://github.com/SaintGao-cmd -->) 
+* [Andrés Felipe Muñoz Martinez](<!-- Remplace aqui link de usario 3 de github -->) 
+* [Laura Ximena Rojas Pachon](<!-- Remplace aqui link de usario 3 de github -->) 
 # Informe
 
 Indice:
@@ -19,7 +20,7 @@ Indice:
 ## Documentación del diseño implementado
 
 ### 1. Sumador/Restador
-#### este tipo
+#### 
 
 #### 1.1 Descripción
 

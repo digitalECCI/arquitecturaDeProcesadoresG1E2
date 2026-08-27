@@ -19,6 +19,7 @@ Indice:
 ## Documentación del diseño implementado
 
 ### 1. Sumador/Restador
+#### este tipo
 
 #### 1.1 Descripción
 

@@ -116,6 +116,148 @@ Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el 
 ### 1. Simulación del sumador/restador
 
 #### 1.1 Descripción
+## Verificación mediante Testbench
+
+Para validar el correcto funcionamiento del módulo, se desarrolló un _testbench_ autoverificable que realiza un barrido exhaustivo de todas las combinaciones posibles de entradas.
+
+El testbench realiza las siguientes comprobaciones:
+- **Cobertura**: 16 valores para `A` × 16 valores para `B` × 2 valores para `Sub` = **512 casos de prueba**.
+- **Cálculo esperado**: 
+  - Para suma (`Sub=0`), calcula `A + B` en 5 bits.
+  - Para resta (`Sub=1`), calcula `A + (~B) + 1` (complemento a 2) en 5 bits.
+- **Salida**: Compara en cada caso la salida del DUT (`S` y `Co`) contra los valores esperados e informa si hay fallos.
+- **Trazas**: Genera un archivo `sumadorRestador.vcd` para visualizar formas de onda en GTKWave.
+
+#### Código del Testbench
+
+```verilog
+`include "sumador.v"
+`include "sumadorRestador.v"
+`timescale 1ms/1ms
+
+module tb_sumadorRestador;
+
+    reg  [3:0] A, B;
+    reg        Sub;
+    wire [3:0] S;
+    wire       Co;
+
+    integer i, j, k;
+    integer errores;
+
+    // Valores esperados calculados con aritmetica normal de Verilog
+    reg [4:0] esperado_suma;   // 5 bits: incluye el acarreo/borrow
+    reg [3:0] S_esp;
+    reg       Co_esp;
+    reg [3:0] B_neg;           // ~B calculado en 4 bits (evita que el
+                                // operador ~ tome el ancho del contexto
+                                // de 5 bits y produzca un resultado erroneo)
+
+    // Instancia del DUT (Device Under Test)
+    sumadorRestador DUT (
+        .A(A),
+        .B(B),
+        .Sub(Sub),
+        .S(S),
+        .Co(Co)
+    );
+
+    // Dump para GTKWave
+    initial begin
+        $dumpfile("sumadorRestador.vcd");
+        $dumpvars(0, tb_sumadorRestador);
+    end
+
+    initial begin
+        errores = 0;
+
+        $display("========================================================");
+        $display(" Simulacion exhaustiva: sumadorRestador (4 bits)");
+        $display("========================================================");
+        $display(" %-4s %-4s %-4s | %-4s %-4s | %-8s %-8s | %-4s",
+                  "A", "B", "Sub", "S", "Co", "S_esp", "Co_esp", "OK?");
+        $display("--------------------------------------------------------");
+
+        // Barrido exhaustivo: A (0-15) x B (0-15) x Sub (0-1) = 512 casos
+        for (i = 0; i < 16; i = i + 1) begin
+            for (j = 0; j < 16; j = j + 1) begin
+                for (k = 0; k < 2; k = k + 1) begin
+                    A   = i[3:0];
+                    B   = j[3:0];
+                    Sub = k[0:0];
+
+                    #10; // tiempo para que se propague la logica
+
+                    if (Sub == 1'b0) begin
+                        // Suma: A + B, resultado de 5 bits (S + Co)
+                        esperado_suma = A + B;
+                        S_esp  = esperado_suma[3:0];
+                        Co_esp = esperado_suma[4];
+                    end else begin
+                        // Resta: A - B en complemento a 2
+                        // {Co_esp, S_esp} = A + (~B, en 4 bits) + 1
+                        B_neg = ~B;
+                        esperado_suma = A + B_neg + 1'b1;
+                        S_esp  = esperado_suma[3:0];
+                        // Co_esp = 1 indica "no hubo prestamo" (A >= B)
+                        Co_esp = esperado_suma[4];
+                    end
+
+                    if ((S !== S_esp) || (Co !== Co_esp)) begin
+                        errores = errores + 1;
+                        $display(" %-4d %-4d %-4d | %-4d %-4d | %-8d %-8d | %-4s  <-- FALLO",
+                                  A, B, Sub, S, Co, S_esp, Co_esp, "NO");
+                    end
+                end
+            end
+        end
+
+        $display("--------------------------------------------------------");
+        if (errores == 0)
+            $display(" RESULTADO: Todos los 512 casos pasaron correctamente.");
+        else
+            $display(" RESULTADO: %0d casos fallaron de 512.", errores);
+        $display("========================================================");
+
+        $finish;
+    end
+
+endmodule
+```
+#### Resultado de la simulación (esperado)
+Al ejecutar este testbench en el simulador `Icarus Verilog`, la consola mostrará un resumen final indicando si todos los casos fueron exitosos. 
+
+```
+ > vvp sumadorRestador_tb.v.out 
+
+VCD info: dumpfile sumadorRestador.vcd opened for output.
+========================================================
+ Simulacion exhaustiva: sumadorRestador (4 bits)
+========================================================
+ A    B    Sub  | S    Co   | S_esp    Co_esp   | OK? 
+--------------------------------------------------------
+--------------------------------------------------------
+ RESULTADO: Todos los 512 casos pasaron correctamente.
+========================================================
+sumadorRestador_tb.v:89: $finish called at 5120 (1ms)
+Execution finished with exit code 0
+```
+
+En caso de fallos, el testbench detalla exactamente qué combinación de entradas produjo un resultado incorrecto, facilitando la depuración.
+
+```
+> iverilog   -o build\sumadorRestador_tb.v.out sumadorRestador_tb.v 
+
+./sumadorRestador.v:23: error: Unknown module type: sumador
+./sumadorRestador.v:32: error: Unknown module type: sumador
+./sumadorRestador.v:41: error: Unknown module type: sumador
+./sumadorRestador.v:50: error: Unknown module type: sumador
+5 error(s) during elaboration.
+*** These modules were missing:
+        sumador referenced 4 times.
+***
+Compilation finished with exit code 5
+```
 
 #### 1.2 Diagrama
 

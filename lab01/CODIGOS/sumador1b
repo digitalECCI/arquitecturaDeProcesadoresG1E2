@@ -1,0 +1,29 @@
+module sumador(
+    input A,
+    input B,
+    input Ci,
+    output S,
+    output Co
+);
+
+    // Cables internos para interconectar las compuertas
+    wire xor_ab;
+    wire and_ab;
+    wire and_b_ci;
+    wire and_a_ci;
+	 
+    wire or_w1;
+
+    // Lógica para la Suma (S)
+    xor u1(xor_ab, A, B);        // XOR de A y B
+    xor u2(S, xor_ab, Ci);       // XOR del resultado anterior con Ci
+
+    // Lógica para el Acarreo de salida (Co)
+    and u3(and_ab, A, B);        // A AND B
+    and u4(and_b_ci, B, Ci);     // B AND Ci
+    and u5(and_a_ci, A, Ci);     // A AND Ci
+    
+    or  u6(or_w1, and_ab, and_b_ci); // (A&B) OR (B&Ci)
+    or  u7(Co, or_w1, and_a_ci);     // Resultado final de Co
+
+endmodule  

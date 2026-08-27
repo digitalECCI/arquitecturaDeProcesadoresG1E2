@@ -3,9 +3,9 @@
 
 # Integrantes
 * [Paula Andrea Cortéz](<!-- Remplace aqui link de usario 1 de github -->) 
-* [Santiago Leonardo Molina Bogotá](<!-- https://github.com/SaintGao-cmd -->)
+* [Santiago Leonardo Molina Bogotá](https://github.com/SaintGao-cmd)
 * [Andrés Felipe Muñoz Martinez](<!-- Remplace aqui link de usario 3 de github -->) 
-* [Laura Ximena Rojas Pachon]( https://github.com/LauXRS) 
+* [Laura Ximena Rojas Pachon](https://github.com/LauXRS) 
 # Informe
 
 Indice:

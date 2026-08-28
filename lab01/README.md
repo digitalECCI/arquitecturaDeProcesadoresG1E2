@@ -19,14 +19,14 @@ Indice:
 
 ## Documentación del diseño implementado
 
-### 1. Sumador/Restador
+### 3. Sumador/Restador
 #### 
 
-#### 1.1 Descripción
+#### 3.1 Descripción
 
 Un sumador/restador de 4 bits es un circuito combinacional que ejecuta sumas y restas binarias optimizando espacio de hardware al reutilizar la misma arquitectura mediante la lógica del complemento a 2.  
 
-### Módulo Sumador/Restador de 4 bits
+#### Módulo Sumador/Restador de 4 bits
 
 Este módulo implementa una suma o resta de dos números de 4 bits (A y B) dependiendo de la señal `Sub`.  
 - Si `Sub = 0`, realiza `S = A + B`.  
@@ -41,84 +41,25 @@ Este módulo implementa una suma o resta de dos números de 4 bits (A y B) depen
 | S     | output | Resultado de la operación (4 bits)   |
 | Co    | output | Acarreo de salida (bit más significativo) |
 
-## Código Verilog
-```verilog
-module sumadorRestador(
-    input  [3:0] A,
-    input  [3:0] B,
-    input        Sub,     // 0 = suma (A+B), 1 = resta (A-B)
-    output [3:0] S,
-    output       Co
-);
-
-    // Cables para B condicionado (invertido si Sub=1)
-    wire [3:0] B_xor;
-
-    // Cables internos para propagar el acarreo entre etapas
-    wire c1, c2, c3;
-
-    // XOR de cada bit de B con Sub: si Sub=1, invierte B (complemento a 1)
-    xor x0(B_xor[0], B[0], Sub);
-    xor x1(B_xor[1], B[1], Sub);
-    xor x2(B_xor[2], B[2], Sub);
-    xor x3(B_xor[3], B[3], Sub);
-
-    // Instancia 0: bit menos significativo
-    // Ci = Sub -> suma el "+1" del complemento a 2 cuando se resta
-    sumador u0 (
-        .A(A[0]),
-        .B(B_xor[0]),
-        .Ci(Sub),
-        .S(S[0]),
-        .Co(c1)
-    );
-
-    // Instancia 1
-    sumador u1 (
-        .A(A[1]),
-        .B(B_xor[1]),
-        .Ci(c1),
-        .S(S[1]),
-        .Co(c2)
-    );
-
-    // Instancia 2
-    sumador u2 (
-        .A(A[2]),
-        .B(B_xor[2]),
-        .Ci(c2),
-        .S(S[2]),
-        .Co(c3)
-    );
-
-    // Instancia 3: bit más significativo
-    sumador u3 (
-        .A(A[3]),
-        .B(B_xor[3]),
-        .Ci(c3),
-        .S(S[3]),
-        .Co(Co)
-    );
-
-endmodule
-```
 ### Funcionamiento
 Las puertas `XOR` condicionan cada bit de B con la señal Sub.
 Si `Sub=1`, B se invierte (complemento a 1); el acarreo de entrada del primer sumador se fuerza a Sub, completando el complemento a 2.
 
 Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el resultado.
 
-#### 1.2 Diagramas
-![pic](imagenes/arquitectura.png)
-##### RTL dado por software Quartus para el Sumador de 4 bits
-![pic](imagenes/sumRest.png)
-##### RTL dado por software Quartus para el Sumador/Restador
+#### 3.2 Diagramas
+![Descripción](imagenes/arquitectura.png "Tooltip")
+*Figura 1. RTL dado por software Quartus para el Sumador de 4 bits*
+
+####
+![Descripción](imagenes/sumRest.png "Tooltip")
+*Figura 2. RTL dado por software Quartus para el Sumador/Restador*
+ 
 ## Simulaciones 
 
-### 1. Simulación del sumador/restador
+### 3. Simulación del sumador/restador
 
-#### 1.1 Descripción
-## Verificación mediante Testbench
+#### 3.1 Verificación mediante Testbench
 
 Para validar el correcto funcionamiento del módulo, se desarrolló un _testbench_ autoverificable que realiza un barrido exhaustivo de todas las combinaciones posibles de entradas.
 
@@ -130,102 +71,6 @@ El testbench realiza las siguientes comprobaciones:
 - **Salida**: Compara en cada caso la salida del DUT (`S` y `Co`) contra los valores esperados e informa si hay fallos.
 - **Trazas**: Genera un archivo `sumadorRestador.vcd` para visualizar formas de onda en GTKWave.
 
-#### Código del Testbench
-
-```verilog
-`include "sumador.v"
-`include "sumadorRestador.v"
-`timescale 1ms/1ms
-
-module tb_sumadorRestador;
-
-    reg  [3:0] A, B;
-    reg        Sub;
-    wire [3:0] S;
-    wire       Co;
-
-    integer i, j, k;
-    integer errores;
-
-    // Valores esperados calculados con aritmetica normal de Verilog
-    reg [4:0] esperado_suma;   // 5 bits: incluye el acarreo/borrow
-    reg [3:0] S_esp;
-    reg       Co_esp;
-    reg [3:0] B_neg;           // ~B calculado en 4 bits (evita que el
-                                // operador ~ tome el ancho del contexto
-                                // de 5 bits y produzca un resultado erroneo)
-
-    // Instancia del DUT (Device Under Test)
-    sumadorRestador DUT (
-        .A(A),
-        .B(B),
-        .Sub(Sub),
-        .S(S),
-        .Co(Co)
-    );
-
-    // Dump para GTKWave
-    initial begin
-        $dumpfile("sumadorRestador.vcd");
-        $dumpvars(0, tb_sumadorRestador);
-    end
-
-    initial begin
-        errores = 0;
-
-        $display("========================================================");
-        $display(" Simulacion exhaustiva: sumadorRestador (4 bits)");
-        $display("========================================================");
-        $display(" %-4s %-4s %-4s | %-4s %-4s | %-8s %-8s | %-4s",
-                  "A", "B", "Sub", "S", "Co", "S_esp", "Co_esp", "OK?");
-        $display("--------------------------------------------------------");
-
-        // Barrido exhaustivo: A (0-15) x B (0-15) x Sub (0-1) = 512 casos
-        for (i = 0; i < 16; i = i + 1) begin
-            for (j = 0; j < 16; j = j + 1) begin
-                for (k = 0; k < 2; k = k + 1) begin
-                    A   = i[3:0];
-                    B   = j[3:0];
-                    Sub = k[0:0];
-
-                    #10; // tiempo para que se propague la logica
-
-                    if (Sub == 1'b0) begin
-                        // Suma: A + B, resultado de 5 bits (S + Co)
-                        esperado_suma = A + B;
-                        S_esp  = esperado_suma[3:0];
-                        Co_esp = esperado_suma[4];
-                    end else begin
-                        // Resta: A - B en complemento a 2
-                        // {Co_esp, S_esp} = A + (~B, en 4 bits) + 1
-                        B_neg = ~B;
-                        esperado_suma = A + B_neg + 1'b1;
-                        S_esp  = esperado_suma[3:0];
-                        // Co_esp = 1 indica "no hubo prestamo" (A >= B)
-                        Co_esp = esperado_suma[4];
-                    end
-
-                    if ((S !== S_esp) || (Co !== Co_esp)) begin
-                        errores = errores + 1;
-                        $display(" %-4d %-4d %-4d | %-4d %-4d | %-8d %-8d | %-4s  <-- FALLO",
-                                  A, B, Sub, S, Co, S_esp, Co_esp, "NO");
-                    end
-                end
-            end
-        end
-
-        $display("--------------------------------------------------------");
-        if (errores == 0)
-            $display(" RESULTADO: Todos los 512 casos pasaron correctamente.");
-        else
-            $display(" RESULTADO: %0d casos fallaron de 512.", errores);
-        $display("========================================================");
-
-        $finish;
-    end
-
-endmodule
-```
 #### Resultado de la simulación (esperado)
 Al ejecutar este testbench en el simulador `Icarus Verilog`, la consola mostrará un resumen final indicando si todos los casos fueron exitosos. 
 
@@ -261,8 +106,16 @@ En caso de fallos, el testbench detalla exactamente qué combinación de entrada
 Compilation finished with exit code 5
 ```
 
-#### 1.2 Diagrama
+#### 3.2 Diagrama
 
+![Descripción](imagenes/graph_sumador.png "Tooltip")
+*Figura 3. Gráfica simulación sumador de 1 bit*
+
+![Descripción](imagenes/graph_sumador4b.png "Tooltip")
+*Figura 4. Gráfica simulación sumador de 4 bits*
+
+![Descripción](imagenes/graph_sumadorRestador.png "Tooltip")
+*Figura 5. Gráfica simulación sumador/restador de 4 bits*
 
 ## Evidencias de implementación
 

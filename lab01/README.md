@@ -239,7 +239,7 @@ Si `Sub=1`, B se invierte (complemento a 1); el acarreo de entrada del primer su
 
 Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el resultado.
 
-#### 3.2 Diagramas
+### 4. Diagramas
 ![Descripción](imagenes/arquitectura.png "Tooltip")
 *Figura 1. RTL dado por software Quartus para el Sumador de 4 bits*
 
@@ -248,6 +248,341 @@ Se instancian 4 sumadores de 1 bit (módulo sumador) en cascada para obtener el 
 *Figura 2. RTL dado por software Quartus para el Sumador/Restador*
  
 ## Simulaciones 
+
+### 1. Simulación del sumador de 1 bit
+
+Este código es un **banco de pruebas** (testbench) escrito en Verilog. Su objetivo es verificar automáticamente que el módulo `sumador` (Diseño Bajo Prueba o DUT) funciona correctamente, probando todas las combinaciones posibles de entrada y comparando sus salidas con un modelo de referencia.
+
+#### 1.1 Inclusión de Archivos y Timescale
+
+```verilog
+`include "sumador.v"  
+`timescale 1ms/1ms
+```
+
+- **`include "sumador.v"`**: Le dice al simulador que incluya el código del diseño (`sumador`) para poder instanciarlo.
+- **`timescale 1ms/1ms`**: Define la unidad de tiempo base y la precisión de la simulación (en este caso, 1 milisegundo para ambos). Esto afecta a los retardos como `#10`.
+
+#### 1.2 Declaración del Módulo y Señales
+
+```verilog
+module tb_sumador;
+
+    // Señales de estímulo y observación
+    reg A, B, Ci;
+    wire S, Co;
+
+    // Variables auxiliares para el chequeo automático
+    integer i;
+    reg S_esperado, Co_esperado;
+    integer errores;
+```
+
+- **`reg A, B, Ci`**: Son las señales de entrada que **generaremos** desde el testbench. Se declaran como `reg` porque las cambiaremos activamente.
+- **`wire S, Co`**: Son las salidas del DUT. Se declaran como `wire` porque el diseño las maneja, nosotros solo las observamos.
+- **`i`**: Variable de control para el bucle `for`.
+- **`S_esperado` y `Co_esperado`**: Variables que almacenarán los valores correctos que deberían producirse (nuestro "modelo de referencia").
+- **`errores`**: Contador de fallos para saber al final si todo salió bien.
+
+#### 1.3 Instancia del DUT (Device Under Test)
+
+```verilog
+    sumador uut (
+        .A(A),
+        .B(B),
+        .Ci(Ci),
+        .S(S),
+        .Co(Co)
+    );
+```
+
+Aquí se crea una copia del módulo `sumador` llamada `uut` (Unidad Bajo Prueba). Las señales del testbench se conectan a sus puertos mediante **conexión por nombre**.
+
+#### 1.4 Volcado de Formas de Onda (para GTKWave)
+
+```verilog
+    initial begin
+        $dumpfile("sumador.vcd");
+        $dumpvars(0, tb_sumador);
+    end
+```
+
+Este bloque inicial crea un archivo llamado `sumador.vcd` (Value Change Dump). Es un archivo que guarda todas las variaciones de las señales del testbench (`tb_sumador`) para que puedas visualizar la simulación gráficamente con herramientas como **GTKWave**.
+
+#### 1.5 Proceso Principal de Pruebas
+
+Este es el corazón del testbench y se ejecuta en otro bloque `initial`.
+
+```verilog
+    initial begin
+        errores = 0;
+
+        $display("=======================================================");
+        $display(" A  B  Ci |  S  Co  |  S_esp  Co_esp  | Resultado");
+        $display("=======================================================");
+```
+
+- Se inicializa el contador de errores en 0.
+- Se imprime una cabecera en la consola para mostrar los resultados en forma de tabla.
+
+#### 1.6 Bucle de 8 Combinaciones
+
+```verilog
+        for (i = 0; i < 8; i = i + 1) begin
+            {A, B, Ci} = i[2:0];
+
+            #10; // Tiempo para que se propague la lógica combinacional
+
+            // Cálculo del valor esperado (modelo de referencia)
+            S_esperado  = A ^ B ^ Ci;
+            Co_esperado = (A & B) | (B & Ci) | (A & Ci);
+```
+
+- El bucle recorre `i` desde 0 hasta 7, cubriendo las **8 combinaciones** posibles de entradas (000, 001, 010, ..., 111).
+- **`{A, B, Ci} = i[2:0]`**: Asigna los 3 bits de `i` a las entradas `A`, `B` y `Ci` en ese orden.
+- **`#10`**: Espera 10 unidades de tiempo (10 ms, debido al `timescale`) para que las compuertas lógicas del sumador tengan tiempo de estabilizar sus salidas.
+- Se calcula el valor **teórico** esperado utilizando las mismas fórmulas booleanas que tiene el diseño, sirviendo esto como "modelo de referencia" (scoreboard).
+
+#### 1.7 Comparación y Reporte
+
+```verilog
+            if ((S !== S_esperado) || (Co !== Co_esperado)) begin
+                errores = errores + 1;
+                $display(" %b  %b  %b  |  %b   %b  |    %b      %b    | FALLO",
+                          A, B, Ci, S, Co, S_esperado, Co_esperado);
+            end else begin
+                $display(" %b  %b  %b  |  %b   %b  |    %b      %b    | OK",
+                          A, B, Ci, S, Co, S_esperado, Co_esperado);
+            end
+        end
+```
+
+- Se comparan las salidas reales (`S` y `Co`) con las esperadas.
+- Si coinciden, se imprime "OK". Si no, se incrementa el contador de errores y se imprime "FALLO".
+- Esto permite un **chequeo automático** sin necesidad de que el usuario revise los valores a ojo.
+
+#### 1.8 Resumen Final y Finalización
+
+```verilog
+        $display("=======================================================");
+        if (errores == 0)
+            $display("TODAS LAS PRUEBAS PASARON CORRECTAMENTE (8/8)");
+        else
+            $display("SE ENCONTRARON %0d ERRORES", errores);
+        $display("=======================================================");
+
+        $finish;
+    end
+```
+
+- Al salir del bucle, se imprime el resultado global de la prueba.
+- Si `errores` es 0, el testbench anuncia que todas las pruebas pasaron.
+- Si hay errores, muestra cuántos se encontraron.
+- **`$finish`**: Termina la simulación.
+
+#### 1.9 Ejemplo de Salida en Consola (Simulación Exitosa)
+
+Al ejecutar la simulación, la consola mostraría algo como:
+
+```
+=======================================================
+ A  B  Ci |  S  Co  |  S_esp  Co_esp  | Resultado
+=======================================================
+ 0  0  0  |  0   0   |    0      0     | OK
+ 0  0  1  |  1   0   |    1      0     | OK
+ 0  1  0  |  1   0   |    1      0     | OK
+ 0  1  1  |  0   1   |    0      1     | OK
+ 1  0  0  |  1   0   |    1      0     | OK
+ 1  0  1  |  0   1   |    0      1     | OK
+ 1  1  0  |  0   1   |    0      1     | OK
+ 1  1  1  |  1   1   |    1      1     | OK
+=======================================================
+TODAS LAS PRUEBAS PASARON CORRECTAMENTE (8/8)
+=======================================================
+```
+
+### 2. Simulación del sumador de 4 bits
+
+#### 2.1 Inclusión de Archivos y Timescale
+
+```verilog
+`include "sumador.v"
+`include "sumador4b.v"
+`timescale 1ms/1ms
+```
+
+- **`include "sumador.v"`** y **`include "sumador4b.v"`**: Incluyen los diseños del sumador de 1 bit y del sumador de 4 bits. El testbench solo instancia el de 4 bits, pero como este usa el de 1 bit internamente, ambos deben estar disponibles.
+- **`timescale 1ms/1ms`**: Establece que cada unidad de tiempo (`#1`) equivale a 1 milisegundo.
+
+#### 2.2 Declaración de Señales y Variables de Control
+
+```verilog
+module tb_sumador4b;
+
+    reg  [3:0] A, B;
+    reg        Ci;
+    wire [3:0] S;
+    wire       Co;
+
+    integer i, j, k;
+    reg [4:0] esperado;   // 5 bits: {Co_esp, S_esp[3:0]}
+    integer errores;
+    integer casos;
+```
+
+| Señal / Variable | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `A, B` | `reg [3:0]` | Entradas de 4 bits que representan los números a sumar. Las genera el testbench. |
+| `Ci` | `reg` | Acarreo de entrada inicial (0 o 1). |
+| `S` | `wire [3:0]` | Salida del DUT (resultado de 4 bits). Solo se observa. |
+| `Co` | `wire` | Acarreo de salida del DUT. Solo se observa. |
+| `i, j, k` | `integer` | Variables de control para los bucles anidados. |
+| `esperado` | `reg [4:0]` | **Modelo de referencia**: Almacena el resultado correcto de la suma en 5 bits (1 bit de acarreo + 4 bits de suma). |
+| `errores` | `integer` | Contador acumulado de fallos. |
+| `casos` | `integer` | Contador del número total de pruebas ejecutadas. |
+
+> **Clave del diseño:** `esperado` tiene 5 bits porque la suma de dos números de 4 bits (`A` y `B`) más un acarreo (`Ci`) puede dar como resultado un número de hasta 5 bits (máximo 15 + 15 + 1 = 31). El bit más significativo de `esperado` (bit 4) representa el acarreo final `Co`, y los bits 3 a 0 representan la suma `S`.
+
+#### 2.3 Instancia del DUT (Device Under Test)
+
+```verilog
+    sumador4b uut (
+        .A(A),
+        .B(B),
+        .Ci(Ci),
+        .S(S),
+        .Co(Co)
+    );
+```
+
+Se crea una instancia del módulo `sumador4b` llamada `uut`. Todas sus entradas y salidas están conectadas a las señales declaradas anteriormente.
+
+#### 2.4 Volcado de Formas de Onda (VCD)
+
+```verilog
+    initial begin
+        $dumpfile("sumador4b.vcd");
+        $dumpvars(0, tb_sumador4b);
+    end
+```
+
+Genera el archivo `sumador4b.vcd` que contiene todas las variaciones de señales del testbench. Este archivo se puede abrir con **GTKWave** para depurar visualmente si se detecta algún fallo.
+
+#### 2.5 Proceso Principal de Pruebas (Bloque `initial`)
+
+Este es el núcleo del testbench. Realiza una **verificación exhaustiva** (también llamada *exhaustive testing*).
+
+### Inicialización y Cabecera
+
+```verilog
+    initial begin
+        errores = 0;
+        casos   = 0;
+
+        $display("===================================================================");
+        $display("  A     B    Ci |   S    Co  |  S_esp  Co_esp | Resultado");
+        $display("===================================================================");
+```
+
+Se inicializan los contadores y se imprime la cabecera de la tabla de resultados en consola.
+
+#### 2.6 Bucles Anidados (Prueba Exhaustiva de 512 Casos)
+
+```verilog
+        for (i = 0; i < 16; i = i + 1) begin
+            for (j = 0; j < 16; j = j + 1) begin
+                for (k = 0; k < 2; k = k + 1) begin
+                    A  = i[3:0];
+                    B  = j[3:0];
+                    Ci = k[0:0];
+
+                    #10;
+
+                    // Modelo de referencia: suma aritmética de 5 bits
+                    esperado = A + B + Ci;
+                    casos = casos + 1;
+```
+
+- **Bucle triple**: Recorre todas las combinaciones posibles:
+  - `i` de 0 a 15 (todos los valores posibles de `A`).
+  - `j` de 0 a 15 (todos los valores posibles de `B`).
+  - `k` de 0 a 1 (todos los valores posibles de `Ci`).
+- **Total**: 16 × 16 × 2 = **512 casos de prueba**, cubriendo el 100% de las posibilidades.
+- **`#10`**: Espera 10 ms para que las compuertas lógicas del sumador en cascada estabilicen su salida.
+- **Modelo de referencia**: `esperado = A + B + Ci` aprovecha la capacidad de Verilog para hacer sumas aritméticas. Como `esperado` es de 5 bits, el resultado se almacena correctamente con su acarreo.
+
+#### 2.7 Comparación y Reporte de Resultados
+
+```verilog
+                    if ((S !== esperado[3:0]) || (Co !== esperado[4])) begin
+                        errores = errores + 1;
+                        $display(" %2d(%b) %2d(%b) %b | %2d(%b) %b | %2d(%b)  %b   | FALLO",
+                                  A, A, B, B, Ci, S, S, Co,
+                                  esperado[3:0], esperado[3:0], esperado[4]);
+                    end else begin
+                        $display(" %2d(%b) %2d(%b) %b | %2d(%b) %b | %2d(%b)  %b   | OK",
+                                  A, A, B, B, Ci, S, S, Co,
+                                  esperado[3:0], esperado[3:0], esperado[4]);
+                    end
+                end
+            end
+        end
+```
+
+- Se comparan:
+  - `S` (salida real) con `esperado[3:0]` (suma esperada).
+  - `Co` (acarreo real) con `esperado[4]` (acarreo esperado).
+- Si **ambos** coinciden, se imprime "OK". Si alguno falla, se incrementa `errores` y se imprime "FALLO" para ese caso concreto.
+- La sentencia `$display` muestra tanto el valor decimal como el binario para facilitar la lectura.
+
+#### 2.8 Resumen Final de la Prueba Masiva
+
+```verilog
+        $display("===================================================================");
+        if (errores == 0)
+            $display("TODAS LAS PRUEBAS PASARON CORRECTAMENTE (%0d/%0d casos)", casos, casos);
+        else
+            $display("SE ENCONTRARON %0d ERRORES DE %0d CASOS", errores, casos);
+        $display("===================================================================");
+```
+
+Al terminar los 512 casos, se imprime un resumen en consola indicando si todas las pruebas pasaron o cuántos errores se encontraron.
+
+#### 2.9 Casos de Ejemplo Adicionales (Depuración Visual)
+
+```verilog
+        $display("");
+        $display("Casos de ejemplo:");
+        A = 4'd5;  B = 4'd3;  Ci = 0; #10;
+        $display(" 5 + 3 + 0  = %0d  (S=%b Co=%b)", S + (Co<<4), S, Co);
+
+        A = 4'd15; B = 4'd1;  Ci = 0; #10;
+        $display("15 + 1 + 0  = %0d  (S=%b Co=%b)  <- overflow esperado", S + (Co<<4), S, Co);
+
+        A = 4'd15; B = 4'd15; Ci = 1; #10;
+        $display("15 + 15 + 1 = %0d  (S=%b Co=%b)  <- caso maximo", S + (Co<<4), S, Co);
+
+        $finish;
+    end
+```
+
+- Después de la prueba automática, el testbench ejecuta **3 casos específicos** (5+3, 15+1 y 15+15+1) para que el usuario pueda verificar visualmente en la consola el comportamiento en casos críticos, incluyendo el desbordamiento (*overflow*).
+- **`$finish`**: Finaliza la simulación.
+
+#### 2.10 Salida Esperada en Consola (Simulación Exitosa)
+
+Al ejecutar la simulación correctamente, la consola mostrará una tabla con los 512 casos (aquí se muestran solo los primeros y últimos como referencia) y finalizará con:
+
+```
+===================================================================
+TODAS LAS PRUEBAS PASARON CORRECTAMENTE (512/512 casos)
+===================================================================
+
+Casos de ejemplo:
+ 5 + 3 + 0  = 8  (S=1000 Co=0)
+15 + 1 + 0  = 16  (S=0000 Co=1)  <- overflow esperado
+15 + 15 + 1 = 31  (S=1111 Co=1)  <- caso maximo
+```
 
 ### 3. Simulación del sumador/restador
 

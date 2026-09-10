@@ -1,4 +1,4 @@
-# LabXX - [Título de la práctica]
+# Lab02: Decodificador BCD a 7 segmentos
 
 # Integrantes
 * [Paula Andrea Cortéz](https://github.com/Cortes271) 
@@ -92,9 +92,11 @@
 
 #### 3.4 Implementación
 
-```verilog
-// [Código]
-```
+![Descripción](Img/Implementación01.jpeg "Tooltip")
+*Figura 1. Adición 15+15 FPGA*
+
+![Descripción](Img/Implementación02.jpeg "Tooltip")
+*Figura 2. Sustracción 3-7 FPGA*
 
 ### 4. Diagramas
 
@@ -104,9 +106,7 @@
 
 #### 1.1 Inclusión de Archivos y Timescale
 
-```verilog
-`include "[archivo].v"
-`timescale [unidad]/[precisión]
+```
 ```
 
 #### 1.2 Declaración del Módulo y Señales
@@ -207,16 +207,6 @@
 
 ![Descripción](ruta/grafica1.png)
 *Figura 3. [Descripción de la gráfica.]*
-
-## Evidencias de implementación
-
-## Preguntas
-
-1. [Pregunta 1]
-   - [Respuesta.]
-
-2. [Pregunta 2]
-   - [Respuesta.]
 
 ## Conclusiones
 

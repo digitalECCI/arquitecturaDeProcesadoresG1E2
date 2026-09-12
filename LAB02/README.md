@@ -205,8 +205,7 @@
 
 #### 3.4 Diagramas
 
-![Descripción](ruta/grafica1.png)
-*Figura 3. [Descripción de la gráfica.]*
+
 
 ## Conclusiones
 

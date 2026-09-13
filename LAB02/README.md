@@ -442,4 +442,4 @@ Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus
 ## Bibliografía
 
 * Ramirez, Jhon (2026). Lab02: Decodificador BCD a 7 segmentos. <https://github.com/digital-ECCI/Arquitetura_de_procesadores-ECCI-2026-II/tree/main/labs/02_lab02>
-* 
+* Logotipo de Nandland. Convertir números binarios a BCD en VHDL y Verilog <https://nandland.com/binary-to-bcd-the-double-dabbler/>

@@ -438,8 +438,6 @@ Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus
 - Separar la lógica de cálculo (negativo como señal booleana) de la lógica de visualización (seg_signo como patrón de segmentos) permitió identificar una buena práctica de diseño: mantener las señales de control/lógica independientes de sus representaciones visuales, facilitando la reutilización del módulo en otros contextos (LEDs, lógica de decisión, etc.) sin depender del hardware de salida específico.
 - La modularidad del diseño (separar el conversor Double Dabble, el decodificador de 7 segmentos y el sumador/restador en bloques independientes) facilitó la depuración, la reutilización de código entre distintos anchos de bits (4, 5 y 8 bits), y la escalabilidad del proyecto hacia implementaciones más complejas.
 
-## Referencias
 ## Bibliografía
-
 * Ramirez, Jhon (2026). Lab02: Decodificador BCD a 7 segmentos. <https://github.com/digital-ECCI/Arquitetura_de_procesadores-ECCI-2026-II/tree/main/labs/02_lab02>
 * Logotipo de Nandland. Convertir números binarios a BCD en VHDL y Verilog <https://nandland.com/binary-to-bcd-the-double-dabbler/>

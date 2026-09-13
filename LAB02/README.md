@@ -321,6 +321,9 @@ El módulo conecta en cascada las etapas ya descritas:
 *Figura 2. Sustracción 3-7 FPGA*
 
 ### 4. Diagramas
+![Descripción](Img/RTL.png)
+*Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus *
+
 
 ## Simulaciones
 

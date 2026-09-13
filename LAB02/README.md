@@ -439,4 +439,7 @@ Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus
 - La modularidad del diseño (separar el conversor Double Dabble, el decodificador de 7 segmentos y el sumador/restador en bloques independientes) facilitó la depuración, la reutilización de código entre distintos anchos de bits (4, 5 y 8 bits), y la escalabilidad del proyecto hacia implementaciones más complejas.
 
 ## Referencias
-- Guia Practica 2 [Lab02: Decodificador BCD a 7 segmentos]([https://ejemplo.com](https://github.com/digital-ECCI/Arquitetura_de_procesadores-ECCI-2026-II/tree/main/labs/02_lab02)).
+## Bibliografía
+
+* Ramirez, Jhon (2026). Lab02: Decodificador BCD a 7 segmentos. <https://github.com/digital-ECCI/Arquitetura_de_procesadores-ECCI-2026-II/tree/main/labs/02_lab02>
+* 

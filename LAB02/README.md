@@ -411,6 +411,18 @@ Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus
 ![Descripción](Img\sumDD.png)
 *Figura 3. [Gráfica módulo sumDD.]*
 
+![Descripción](Img\bcd_a_7seg.png)
+*Figura 4. [Gráfica módulo bcd_a_7seg_anodo_comun.]*
+
+![Descripción](Img\dd_stage_2d.png)
+*Figura 5. [Gráfica módulo dd_stage_2d.]*
+
+![Descripción](Img\double_dabble_5bit.png)
+*Figura 6. [Gráfica módulo double_dabble_5bit.]*
+
+![Descripción](Img\sumador_restador_4bit.png)
+*Figura 7. [Gráfica módulo sumador_restador_4bit.]*
+
 ### 3. Simulación de [Módulo 3]
 
 #### 3.1 Verificación mediante Testbench

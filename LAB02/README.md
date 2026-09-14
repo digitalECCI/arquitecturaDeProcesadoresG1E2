@@ -406,8 +406,8 @@ El módulo conecta en cascada las etapas ya descritas:
 
 #### 2.7 Diagramas de Simulación
 
-![Descripción](ruta/grafica.png)
-*Figura 2. [Descripción de la gráfica.]*
+![Descripción](Img\sumDD.png)
+*Figura 3. [Gráfica módulo sumDD.]*
 
 ### 3. Simulación de [Módulo 3]
 

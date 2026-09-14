@@ -326,87 +326,70 @@ Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus
 
 ## Simulaciones
 
-### 1. Simulación de [Módulo 1]
-
-#### 1.1 Inclusión de Archivos y Timescale
-
-```
-```
-
-#### 1.2 Declaración del Módulo y Señales
-
+Testbench del módulo top que integra todo el sistema (sumador/restador → double dabble → BCD a 7 segmentos).
+ 
+## 1. Includes y preparación del DUT
+ 
 ```verilog
-// [Código]
+`include "DECO_7_SEG/sumDD.v"
+...
+`timescale 1s/1s
 ```
-
-#### 1.3 Instancia del DUT
-
+ 
+Incluye todos los módulos del proyecto y define la escala de tiempo (aquí `1s/1s`, solo para simulación, sin relación con tiempo real de hardware).
+ 
+Se declaran las señales que conectan con el DUT (`uut`):
+ 
+- **Entradas**: `A`, `B` (4 bits cada uno), `operacion` (0 = suma, 1 = resta).
+- **Salidas**: `seg_decenas`, `seg_unidades`, `seg_signo` (los tres displays de 7 segmentos) y `negativo` (bandera de signo).
+### 1.1 Modelo de referencia (`seg_esperado`)
+ 
 ```verilog
-// [Código]
+function [6:0] seg_esperado;
+    input [3:0] b;
+    ...
+endfunction
 ```
-
-#### 1.4 Volcado de Formas de Onda
-
+ 
+Esta función es clave: es un **decodificador BCD→7seg escrito independientemente del diseño**, con los mismos patrones que debería producir el módulo `bcd_a_7seg_anodo_comun`. Sirve como "oráculo" para comparar contra la salida real del DUT, sin depender de que la implementación esté bien.
+ 
+### 1.2 Barrido exhaustivo (fuerza bruta)
+ 
 ```verilog
-// [Código]
+for (i = 0; i < 16; i = i + 1)
+  for (j = 0; j < 16; j = j + 1)
+    for (k = 0; k < 2; k = k + 1)
 ```
-
-#### 1.5 Proceso Principal de Pruebas
-
+ 
+Prueba **las 512 combinaciones posibles** (16 × 16 × 2): todos los valores de `A`, todos los de `B`, y ambas operaciones. Es una verificación exhaustiva, no solo casos puntuales.
+ 
+En cada iteración:
+ 
+1. Asigna `A`, `B`, `operacion`.
+2. Espera `#10` (tiempo para que la lógica combinacional/secuencial se estabilice).
+3. Calcula el **resultado esperado en el testbench mismo** (no leyendo el DUT):
+   - Si suma: `mag_esp = A + B`, signo siempre positivo.
+   - Si resta: compara `A` vs `B` para decidir magnitud y signo (resta en el orden correcto y marca `neg_esp`).
+4. Convierte esa magnitud esperada a decenas/unidades (`/10`, `%10`) y las pasa por `seg_esperado(...)` para obtener los patrones de 7 segmentos esperados.
+5. Compara con `!==` (comparación que también detecta `x`/`z`) los 4 valores del DUT contra los esperados.
+6. Si hay diferencia, incrementa `errores` e imprime la fila con `$display`, mostrando lado a lado real vs. esperado para depurar directamente desde la consola.
+### 1.3 Reporte final
+ 
 ```verilog
-// [Código]
+if (errores == 0)
+    $display("TODAS LAS PRUEBAS PASARON...");
+else
+    $display("SE ENCONTRARON %0d ERRORES...");
 ```
+ 
+Da un veredicto único: cuántos de los 512 casos fallaron, si alguno.
+ 
+### 1.4 Casos de ejemplo "humanos"
+ 
+Al final corre 3 casos específicos con `$display` mostrando resultados en binario crudo, útil para verificación manual rápida (9+8=17, 2-9=-7, 15+15=30 — este último prueba el límite superior del rango).
+ 
 
-#### 1.6 Modelo de Referencia
-
-#### 1.7 Salida Esperada en Consola
-
-```text
-[Salida esperada]
-```
-
-#### 1.8 Resultados
-
-### 2. Simulación de [Módulo 2]
-
-#### 2.1 Inclusión de Archivos y Timescale
-
-```verilog
-`include "[archivo].v"
-`timescale [unidad]/[precisión]
-```
-
-#### 2.2 Declaración de Señales y Variables
-
-| Señal / Variable | Tipo | Descripción |
-| :--- | :--- | :--- |
-|  |  |  |
-
-#### 2.3 Instancia del DUT
-
-```verilog
-// [Código]
-```
-
-#### 2.4 Volcado VCD
-
-```verilog
-// [Código]
-```
-
-#### 2.5 Proceso Principal de Pruebas
-
-```verilog
-// [Código]
-```
-
-#### 2.6 Salida Esperada en Consola
-
-```text
-[Salida esperada]
-```
-
-#### 2.7 Diagramas de Simulación
+### 1.5 Diagramas de Simulación
 
 ![Descripción](Img/sumDD.png)
 *Figura 3. Gráfica módulo sumDD.*
@@ -422,26 +405,6 @@ Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus
 
 ![Descripción](Img/sumador_restador_4bit.png)
 *Figura 7. Gráfica módulo sumador_restador_4bit.*
-
-### 3. Simulación de [Módulo 3]
-
-#### 3.1 Verificación mediante Testbench
-
-#### 3.2 Resultado de la Simulación
-
-```text
-[Salida obtenida]
-```
-
-#### 3.3 Posibles Errores y Depuración
-
-```text
-[Errores comunes]
-```
-
-#### 3.4 Diagramas
-
-
 
 ## Conclusiones
 - El algoritmo Double Dabble demostró ser una solución eficiente para la conversión binario-BCD sin necesidad de usar divisiones ni módulos aritméticos complejos, apoyándose únicamente en desplazamientos y sumas condicionales.

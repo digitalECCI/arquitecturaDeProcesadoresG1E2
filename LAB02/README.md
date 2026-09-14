@@ -321,6 +321,8 @@ El módulo conecta en cascada las etapas ya descritas:
 *Figura 2. Sustracción 3-7 FPGA*
 
 ### 4. Diagramas
+![Descripción](Img/RTL.png)
+Figura 3. Diagrama esquematico RTL de descripción de hardware dado por Quartus 
 
 ## Simulaciones
 
@@ -430,12 +432,12 @@ El módulo conecta en cascada las etapas ya descritas:
 
 
 ## Conclusiones
+- El algoritmo Double Dabble demostró ser una solución eficiente para la conversión binario-BCD sin necesidad de usar divisiones ni módulos aritméticos complejos, apoyándose únicamente en desplazamientos y sumas condicionales.
+- El uso del operador ternario (?:) en lugar de if evidenció que en Verilog, a diferencia de un lenguaje de software, las condiciones no representan "bifurcaciones de control" sino multiplexores de hardware, es decir, ambos caminos existen físicamente y solo se selecciona cuál valor pasa.
+- Escalar el diseño de 8 bits a 4 y 5 bits permitió comprobar que el número de etapas del Double Dabble depende directamente del ancho del dato de entrada (N etapas para N bits), y que el ancho del registro BCD debe dimensionarse según la cantidad máxima de dígitos decimales que el resultado pueda alcanzar.
+- Separar la lógica de cálculo (negativo como señal booleana) de la lógica de visualización (seg_signo como patrón de segmentos) permitió identificar una buena práctica de diseño: mantener las señales de control/lógica independientes de sus representaciones visuales, facilitando la reutilización del módulo en otros contextos (LEDs, lógica de decisión, etc.) sin depender del hardware de salida específico.
+- La modularidad del diseño (separar el conversor Double Dabble, el decodificador de 7 segmentos y el sumador/restador en bloques independientes) facilitó la depuración, la reutilización de código entre distintos anchos de bits (4, 5 y 8 bits), y la escalabilidad del proyecto hacia implementaciones más complejas.
 
-- [Conclusión 1.]
-- [Conclusión 2.]
-- [Conclusión 3.]
-
-## Referencias
-
-- [Autor. Título. Año. URL.]
-- [Autor. Título. Año. URL.]
+## Bibliografía
+* Ramirez, Jhon (2026). Lab02: Decodificador BCD a 7 segmentos. <https://github.com/digital-ECCI/Arquitetura_de_procesadores-ECCI-2026-II/tree/main/labs/02_lab02>
+* Logotipo de Nandland. Convertir números binarios a BCD en VHDL y Verilog <https://nandland.com/binary-to-bcd-the-double-dabbler/>

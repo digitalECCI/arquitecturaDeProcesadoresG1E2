@@ -1,10 +1,10 @@
 # Lab04: ALU, banco registro y UART.
 
 # Integrantes
-* [Integrante 1]([URL])
-* [Integrante 2]([URL])
-* [Integrante 3]([URL])
-* [Integrante 4]([URL])
+* [Paula Andrea Cortéz](https://github.com/Cortes271) 
+* [Santiago Leonardo Molina Bogotá](https://github.com/SaintGao-cmd)
+* [Andrés Felipe Muñoz Martinez](https://github.com/Andresfmm2007) 
+* [Laura Ximena Rojas Pachon](https://github.com/LauXRS) 
 
 # Informe
 

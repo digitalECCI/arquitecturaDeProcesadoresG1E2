@@ -1,4 +1,4 @@
-# LabXX - [Título de la práctica]
+# Lab04: ALU, banco registro y UART.
 
 # Integrantes
 * [Integrante 1]([URL])

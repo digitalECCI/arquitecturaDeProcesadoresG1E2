@@ -25,9 +25,7 @@
 
 #### 1.2 Declaración del Módulo y Puertos
 
-```verilog
-// [Código]
-```
+
 
 #### 1.3 Cables Internos
 

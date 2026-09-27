@@ -36,10 +36,14 @@ module full_adder_1bit (
 )
 ```
 a: primer bit que se quiere sumar.
+
 b: segundo bit que se quiere sumar.
+
 cin: acarreo de entrada. Es el bit que viene de la suma anterior.
+
 sum: resultado de la suma.
-cout: acarreo de salida, que se envía a la siguiente posición.
+
+sout: acarreo de salida, que se envía a la siguiente posición.
 
 
 #### 1.3 Cables Internos
@@ -90,17 +94,26 @@ cin: Acarreo inicial de entrada.
 suma: Bus del resultado de la suma en 8 bits.
 
 cout: Acarreo final de salida del bit más significativo.
+
 #### 2.3 Cables Internos
 
-```verilog
-// [Código]
+```
+wire [7:0] c; // Interconexión en cascada de acarreos entre etapas
 ```
 
 #### 2.4 Lógica
 
-```verilog
-// [Código]
 ```
+full_adder_1bit fa0 (.a(A[0]), .b(B[0]), .cin(cin),  .sum(suma[0]), .cout(c[0]));
+full_adder_1bit fa1 (.a(A[1]), .b(B[1]), .cin(c[0]), .sum(suma[1]), .cout(c[1]));
+full_adder_1bit fa2 (.a(A[2]), .b(B[2]), .cin(c[1]), .sum(suma[2]), .cout(c[2]));
+full_adder_1bit fa3 (.a(A[3]), .b(B[3]), .cin(c[2]), .sum(suma[3]), .cout(c[3]));
+full_adder_1bit fa4 (.a(A[4]), .b(B[4]), .cin(c[3]), .sum(suma[4]), .cout(c[4]));
+full_adder_1bit fa5 (.a(A[5]), .b(B[5]), .cin(c[4]), .sum(suma[5]), .cout(c[5]));
+full_adder_1bit fa6 (.a(A[6]), .b(B[6]), .cin(c[5]), .sum(suma[6]), .cout(c[6]));
+full_adder_1bit fa7 (.a(A[7]), .b(B[7]), .cin(c[6]), .sum(suma[7]), .cout(cout));
+```
+Explicación: Cada etapa i calcula el bit de suma suma[i] y pasa su acarreo c[i] como entrada cin de la etapa i+1.
 
 #### 2.5 Tabla de Verdad
 

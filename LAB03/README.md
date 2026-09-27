@@ -55,9 +55,13 @@ Explicación:  La salida sum se calcula mediante la función XOR entre los tres 
 
 #### 1.5 Tabla de Verdad
 
-| [Entrada 1] | [Entrada 2] | [Salida 1] | [Salida 2] |
+| BCD (`bcd`) | Segmentos `[g f e d c b a]` | Hexadecimal | Dígito Muestral |
 | :---: | :---: | :---: | :---: |
-|  |  |  |  |
+| `0000` (0) | `1000000` | `0x40` | 0 |
+| `0001` (1) | `1111001` | `0x79` | 1 |
+| `0101` (5) | `0010010` | `0x12` | 5 |
+| `1001` (9) | `0010000` | `0x10` | 9 |
+| Otros (>9) | `1111111` | `0x7F` | Apagado |
 
 #### 1.6 Ejemplo Práctico
 

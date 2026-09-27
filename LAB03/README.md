@@ -67,16 +67,29 @@ Explicación:  La salida sum se calcula mediante la función XOR entre los tres 
 
 #### 1.7 Limitaciones
 
-### 2. [Módulo 2]
+### 2. Módulo sumador_8bit_ripple
 
 #### 2.1 Descripción
+Implementa un sumador por propagación de acarreo (Ripple Carry Adder) de 8 bits a partir de la instanciación en cascada de 8 sumadores completos de 1 bit (full_adder_1bit).
 
 #### 2.2 Declaración del Módulo y Puertos
 
-```verilog
-// [Código]
 ```
+module sumador_8bit_ripple (
+    input  wire [7:0] A,
+    input  wire [7:0] B,
+    input  wire       cin,
+    output wire [7:0] suma,
+    output wire       cout
+);
+```
+A, B: Bus de operandos de 8 bits (0 a 255).
 
+cin: Acarreo inicial de entrada.
+
+suma: Bus del resultado de la suma en 8 bits.
+
+cout: Acarreo final de salida del bit más significativo.
 #### 2.3 Cables Internos
 
 ```verilog

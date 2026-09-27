@@ -21,36 +21,37 @@
 
 ### 1. [Módulo 1]
 
-#### 1.1 Descripción
+#### 1.1 Módulo full_adder_1bit
+Este módulo se encarga de sumar dos bits (a y b) teniendo en cuenta un posible acarreo de entrada (cin). El resultado se entrega mediante dos salidas: sum, que representa el resultado de la suma, y cout, que representa el acarreo que pasa a la siguiente posición. 
 
 #### 1.2 Declaración del Módulo y Puertos
 
+```verilog
+module full_adder_1bit (
+    input  wire a,
+    input  wire b,
+    input  wire cin,
+    output wire sum,
+    output wire cout
+)
+```
+a: primer bit que se quiere sumar.
+b: segundo bit que se quiere sumar.
+cin: acarreo de entrada. Es el bit que viene de la suma anterior.
+sum: resultado de la suma.
+cout: acarreo de salida, que se envía a la siguiente posición.
 
 
 #### 1.3 Cables Internos
-
-```verilog
-always @(*) begin
-        case (bcd)
-            4'd0: seg = 7'b1000000;
-            4'd1: seg = 7'b1111001;
-            4'd2: seg = 7'b0100100;
-            4'd3: seg = 7'b0110000;
-            4'd4: seg = 7'b0011001;
-            4'd5: seg = 7'b0010010;
-            4'd6: seg = 7'b0000010;
-            4'd7: seg = 7'b1111000;
-            4'd8: seg = 7'b0000000;
-            4'd9: seg = 7'b0010000;
-            default: seg = 7'b1111111;
-        endcase
-```
+Este módulo no requiere cables internos adicionales, implementándose directamente mediante expresiones lógicas combinacionales
 
 #### 1.4 Lógica
 
 ```verilog
-// [Código]
+assign sum  = a ^ b ^ cin;
+assign cout = (a & b) | (b & cin) | (a & cin);
 ```
+Explicación:  La salida sum se calcula mediante la función XOR entre los tres bits de entrada (a ^ b ^ cin). El acarreo de salida cout se activa si al menos dos de las tres entradas están en nivel alto (1).
 
 #### 1.5 Tabla de Verdad
 

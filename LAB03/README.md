@@ -331,10 +331,9 @@ ready: Bandera que indica operación finalizada y salida válida.
 
 ## Conclusiones
 
-- [Conclusión 1.]
-- [Conclusión 2.]
-- [Conclusión 3.]
-
+- Se logró una implementación modular exitosa integrando celdas de 1 bit hasta módulos funcionales complejos de control y visualización.
+- La implementación del filtro debounce y la FSM asegura estabilidad operativa frente a transiciones de entrada físicamente ruidosas.
+- El uso del algoritmo Double Dabble sobre el resultado del multiplicador simplifica sustancialmente la representación BCD sin recurrir a divisores lógicos demandantes en área.
 ## Referencias
 
 - [Autor. Título. Año. URL.]

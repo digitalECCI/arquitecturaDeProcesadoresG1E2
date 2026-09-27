@@ -154,15 +154,57 @@ producto: Resultado de la multiplicación de 8 bits (0 a 225)
 wire [7:0] p0, p1, p2, p3;  // Productos parciales alineados
 wire [7:0] s1, s2;          // Resultados intermedios de sumas
 wire c_dummy1, c_dummy2, c_dummy3;
-#### 3.4 Implementación
 ```
-
 #### 3.4 Lógica
+```
+assign p0 = B[0] ? {4'b0, A}: 8'b0;
+assign p1 = B[1] ? {3'b0, A, 1'b0}  : 8'b0;
+assign p2 = B[2] ? {2'b0, A, 2'b0}  : 8'b0;
+assign p3 = B[3] ? {1'b0, A, 3'b0}  : 8'b0;
+
+sumador_8bit_ripple add1 (.A(p0), .B(p1), .cin(1'b0), .suma(s1),       .cout(c_dummy1));
+sumador_8bit_ripple add2 (.A(s1), .B(p2), .cin(1'b0), .suma(s2),       .cout(c_dummy2));
+sumador_8bit_ripple add3 (.A(s2), .B(p3), .cin(1 me0), .suma(producto), .cout(c_dummy3));
+```
+#### 3.5 Tablas de verdad
+
+#### 3.6 Ejemplo Práctico
+
+#### 3.7 Limitaciones
+
+### 4. Módulo unidad_control
+
+#### 4.1 Descripción
+
+Implementa una máquina de estados finitos (FSM) secuencial que gestiona el flujo de operación del sistema, controlando la habilitación del cálculo de multiplicación y la actualización del registro de salida
+
+#### 4.2 Declaración del Módulo y Puertos
+
+```
+module unidad_control (
+    input  wire clk,
+    input  wire rst_n,
+    input  wire btn_calcular,
+    output reg  calc_en,
+    output reg  ready
+);
+```
+clk: Señal de reloj principal.
+
+rst_n: Reinicio global activo en bajo.
+
+btn_calcular: Disparo de inicio de procesamiento.
+
+calc_en: Habilitación de la lógica operativa.
+
+ready: Bandera que indica operación finalizada y salida válida.
 
 
-#### 3.5 Diagramas
 
-### 4. Diagramas
+
+
+
+### 5. Diagramas
 
 ![Descripción](ruta/imagen.png)
 *Figura 1. [Descripción de la figura.]*

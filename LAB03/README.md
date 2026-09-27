@@ -117,31 +117,48 @@ Explicación: Cada etapa i calcula el bit de suma suma[i] y pasa su acarreo c[i]
 
 #### 2.5 Tabla de Verdad
 
-| [Entrada 1] | [Entrada 2] | [Salida 1] | [Salida 2] |
-| :---: | :---: | :---: | :---: |
-|  |  |  |  |
+Dado que el módulo posee 17 bits de entrada en total ($8 + 8 + 1$), la tabla de verdad completa consta de 131,072 combinaciones. A continuación se presentan los casos  clave del sumador:
+
+| A (Decimal) | B (Decimal) | cin | suma (Binario) | suma (Decimal) | cout | Interpretación / Estado |
+| :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| `00000000` (0) | `00000000` (0) | 0 | `00000000` | 0 | 0 | Suma mínima sin acarreo |
+| `00000101` (5) | `00000011` (3) | 0 | `00001000` | 8 | 0 | Suma estándar ($5 + 3 = 8$) |
+| `00000101` (5) | `00000011` (3) | 1 | `00001001` | 9 | 0 | Suma con acarreo entrante ($5 + 3 + 1 = 9$) |
+| `01111111` (127) | `10000000` (128) | 0 | `11111111` | 255 | 0 | Valor máximo sin desbordamiento |
+| `11111111` (255) | `00000001` (1) | 0 | `00000000` | 0 | 1 | Desbordamiento de 8 bits ($255 + 1 = 256$) |
+| `11111111` (255) | `11111111` (255) | 1 | `11111111` | 255 | 1 | Valor máximo con acarreo ($255 + 255 + 1 = 511$) |
 
 #### 2.6 Ejemplo Práctico
 
 #### 2.7 Limitaciones
 
-### 3. [Módulo 3]
+### 3. Módulo multiplicador
 
 #### 3.1 Descripción
+Este módulo realiza la multiplicación sin signo de dos números de 4 bits (A y B). Genera un resultado de 8 bits (producto) mediante la generación de productos parciales y su adición acumulativa con el sumador de 8 bits.
 
-#### 3.2 Entradas y Salidas
-
-| Señal | Tipo | Descripción |
-| :--- | :--- | :--- |
-|  |  |  |
-
-#### 3.3 Funcionamiento
-
-#### 3.4 Implementación
-
-```verilog
-// [Código]
+#### 3.2 Declaración del Módulo y Puertos
 ```
+module multiplicador (
+    input  wire [3:0] A,
+    input  wire [3:0] B,
+    output wire [7:0] producto
+);
+```
+A, B: Operandos de entrada de 4 bits (0 a 15).
+
+producto: Resultado de la multiplicación de 8 bits (0 a 225)
+
+#### 3.3 Cables Internos
+```
+wire [7:0] p0, p1, p2, p3;  // Productos parciales alineados
+wire [7:0] s1, s2;          // Resultados intermedios de sumas
+wire c_dummy1, c_dummy2, c_dummy3;
+#### 3.4 Implementación
+```
+
+#### 3.4 Lógica
+
 
 #### 3.5 Diagramas
 

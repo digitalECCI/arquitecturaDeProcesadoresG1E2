@@ -21,88 +21,191 @@
 
 ### 1. [Módulo 1]
 
-#### 1.1 Descripción
+#### 1.1 Módulo full_adder_1bit
+Este módulo se encarga de sumar dos bits (a y b) teniendo en cuenta un posible acarreo de entrada (cin). El resultado se entrega mediante dos salidas: sum, que representa el resultado de la suma, y cout, que representa el acarreo que pasa a la siguiente posición. 
 
 #### 1.2 Declaración del Módulo y Puertos
 
+```verilog
+module full_adder_1bit (
+    input  wire a,
+    input  wire b,
+    input  wire cin,
+    output wire sum,
+    output wire cout
+)
+```
+a: primer bit que se quiere sumar.
+
+b: segundo bit que se quiere sumar.
+
+cin: acarreo de entrada. Es el bit que viene de la suma anterior.
+
+sum: resultado de la suma.
+
+sout: acarreo de salida, que se envía a la siguiente posición.
 
 
 #### 1.3 Cables Internos
-
-```verilog
-// [Código]
-```
+Este módulo no requiere cables internos adicionales, implementándose directamente mediante expresiones lógicas combinacionales
 
 
 #### 1.4 Lógica
 
 ```verilog
-// [Código]
+assign sum  = a ^ b ^ cin;
+assign cout = (a & b) | (b & cin) | (a & cin);
 ```
+Explicación:  La salida sum se calcula mediante la función XOR entre los tres bits de entrada (a ^ b ^ cin). El acarreo de salida cout se activa si al menos dos de las tres entradas están en nivel alto (1).
 
 #### 1.5 Tabla de Verdad
 
-| [Entrada 1] | [Entrada 2] | [Salida 1] | [Salida 2] |
+| BCD (`bcd`) | Segmentos `[g f e d c b a]` | Hexadecimal | Dígito Muestral |
 | :---: | :---: | :---: | :---: |
-|  |  |  |  |
+| `0000` (0) | `1000000` | `0x40` | 0 |
+| `0001` (1) | `1111001` | `0x79` | 1 |
+| `0101` (5) | `0010010` | `0x12` | 5 |
+| `1001` (9) | `0010000` | `0x10` | 9 |
+| Otros (>9) | `1111111` | `0x7F` | Apagado |
 
 #### 1.6 Ejemplo Práctico
 
 #### 1.7 Limitaciones
 
-### 2. [Módulo 2]
+### 2. Módulo sumador_8bit_ripple
 
 #### 2.1 Descripción
+Implementa un sumador por propagación de acarreo (Ripple Carry Adder) de 8 bits a partir de la instanciación en cascada de 8 sumadores completos de 1 bit (full_adder_1bit).
 
 #### 2.2 Declaración del Módulo y Puertos
 
-```verilog
-// [Código]
 ```
+module sumador_8bit_ripple (
+    input  wire [7:0] A,
+    input  wire [7:0] B,
+    input  wire       cin,
+    output wire [7:0] suma,
+    output wire       cout
+);
+```
+A, B: Bus de operandos de 8 bits (0 a 255).
+
+cin: Acarreo inicial de entrada.
+
+suma: Bus del resultado de la suma en 8 bits.
+
+cout: Acarreo final de salida del bit más significativo.
 
 #### 2.3 Cables Internos
 
-```verilog
-// [Código]
+```
+wire [7:0] c; // Interconexión en cascada de acarreos entre etapas
 ```
 
 #### 2.4 Lógica
 
-```verilog
-// [Código]
 ```
+full_adder_1bit fa0 (.a(A[0]), .b(B[0]), .cin(cin),  .sum(suma[0]), .cout(c[0]));
+full_adder_1bit fa1 (.a(A[1]), .b(B[1]), .cin(c[0]), .sum(suma[1]), .cout(c[1]));
+full_adder_1bit fa2 (.a(A[2]), .b(B[2]), .cin(c[1]), .sum(suma[2]), .cout(c[2]));
+full_adder_1bit fa3 (.a(A[3]), .b(B[3]), .cin(c[2]), .sum(suma[3]), .cout(c[3]));
+full_adder_1bit fa4 (.a(A[4]), .b(B[4]), .cin(c[3]), .sum(suma[4]), .cout(c[4]));
+full_adder_1bit fa5 (.a(A[5]), .b(B[5]), .cin(c[4]), .sum(suma[5]), .cout(c[5]));
+full_adder_1bit fa6 (.a(A[6]), .b(B[6]), .cin(c[5]), .sum(suma[6]), .cout(c[6]));
+full_adder_1bit fa7 (.a(A[7]), .b(B[7]), .cin(c[6]), .sum(suma[7]), .cout(cout));
+```
+Explicación: Cada etapa i calcula el bit de suma suma[i] y pasa su acarreo c[i] como entrada cin de la etapa i+1.
 
 #### 2.5 Tabla de Verdad
 
-| [Entrada 1] | [Entrada 2] | [Salida 1] | [Salida 2] |
-| :---: | :---: | :---: | :---: |
-|  |  |  |  |
+Dado que el módulo posee 17 bits de entrada en total ($8 + 8 + 1$), la tabla de verdad completa consta de 131,072 combinaciones. A continuación se presentan los casos  clave del sumador:
+
+| A (Decimal) | B (Decimal) | cin | suma (Binario) | suma (Decimal) | cout | Interpretación / Estado |
+| :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| `00000000` (0) | `00000000` (0) | 0 | `00000000` | 0 | 0 | Suma mínima sin acarreo |
+| `00000101` (5) | `00000011` (3) | 0 | `00001000` | 8 | 0 | Suma estándar ($5 + 3 = 8$) |
+| `00000101` (5) | `00000011` (3) | 1 | `00001001` | 9 | 0 | Suma con acarreo entrante ($5 + 3 + 1 = 9$) |
+| `01111111` (127) | `10000000` (128) | 0 | `11111111` | 255 | 0 | Valor máximo sin desbordamiento |
+| `11111111` (255) | `00000001` (1) | 0 | `00000000` | 0 | 1 | Desbordamiento de 8 bits ($255 + 1 = 256$) |
+| `11111111` (255) | `11111111` (255) | 1 | `11111111` | 255 | 1 | Valor máximo con acarreo ($255 + 255 + 1 = 511$) |
 
 #### 2.6 Ejemplo Práctico
 
 #### 2.7 Limitaciones
 
-### 3. [Módulo 3]
+### 3. Módulo multiplicador
 
 #### 3.1 Descripción
+Este módulo realiza la multiplicación sin signo de dos números de 4 bits (A y B). Genera un resultado de 8 bits (producto) mediante la generación de productos parciales y su adición acumulativa con el sumador de 8 bits.
 
-#### 3.2 Entradas y Salidas
-
-| Señal | Tipo | Descripción |
-| :--- | :--- | :--- |
-|  |  |  |
-
-#### 3.3 Funcionamiento
-
-#### 3.4 Implementación
-
-```verilog
-// [Código]
+#### 3.2 Declaración del Módulo y Puertos
 ```
+module multiplicador (
+    input  wire [3:0] A,
+    input  wire [3:0] B,
+    output wire [7:0] producto
+);
+```
+A, B: Operandos de entrada de 4 bits (0 a 15).
 
-#### 3.5 Diagramas
+producto: Resultado de la multiplicación de 8 bits (0 a 225)
 
-### 4. Diagramas
+#### 3.3 Cables Internos
+```
+wire [7:0] p0, p1, p2, p3;  // Productos parciales alineados
+wire [7:0] s1, s2;          // Resultados intermedios de sumas
+wire c_dummy1, c_dummy2, c_dummy3;
+```
+#### 3.4 Lógica
+```
+assign p0 = B[0] ? {4'b0, A}: 8'b0;
+assign p1 = B[1] ? {3'b0, A, 1'b0}  : 8'b0;
+assign p2 = B[2] ? {2'b0, A, 2'b0}  : 8'b0;
+assign p3 = B[3] ? {1'b0, A, 3'b0}  : 8'b0;
+
+sumador_8bit_ripple add1 (.A(p0), .B(p1), .cin(1'b0), .suma(s1),       .cout(c_dummy1));
+sumador_8bit_ripple add2 (.A(s1), .B(p2), .cin(1'b0), .suma(s2),       .cout(c_dummy2));
+sumador_8bit_ripple add3 (.A(s2), .B(p3), .cin(1 me0), .suma(producto), .cout(c_dummy3));
+```
+#### 3.5 Tablas de verdad
+
+#### 3.6 Ejemplo Práctico
+
+#### 3.7 Limitaciones
+
+### 4. Módulo unidad_control
+
+#### 4.1 Descripción
+
+Implementa una máquina de estados finitos (FSM) secuencial que gestiona el flujo de operación del sistema, controlando la habilitación del cálculo de multiplicación y la actualización del registro de salida
+
+#### 4.2 Declaración del Módulo y Puertos
+
+```
+module unidad_control (
+    input  wire clk,
+    input  wire rst_n,
+    input  wire btn_calcular,
+    output reg  calc_en,
+    output reg  ready
+);
+```
+clk: Señal de reloj principal.
+
+rst_n: Reinicio global activo en bajo.
+
+btn_calcular: Disparo de inicio de procesamiento.
+
+calc_en: Habilitación de la lógica operativa.
+
+ready: Bandera que indica operación finalizada y salida válida.
+
+
+
+
+
+
+### 5. Diagramas
 
 ![Descripción](ruta/imagen.png)
 *Figura 1. [Descripción de la figura.]*
@@ -229,10 +332,9 @@
 
 ## Conclusiones
 
-- [Conclusión 1.]
-- [Conclusión 2.]
-- [Conclusión 3.]
-
+- Se logró una implementación modular exitosa integrando celdas de 1 bit hasta módulos funcionales complejos de control y visualización.
+- La implementación del filtro debounce y la FSM asegura estabilidad operativa frente a transiciones de entrada físicamente ruidosas.
+- El uso del algoritmo Double Dabble sobre el resultado del multiplicador simplifica sustancialmente la representación BCD sin recurrir a divisores lógicos demandantes en área.
 ## Referencias
 
 - [Autor. Título. Año. URL.]

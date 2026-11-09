@@ -278,72 +278,31 @@ El sistema inicia con la detección de una pulsación, cuya señal pasa por un f
 
 ### 1. Simulación de la [ALU]
 
-l
+| Suma | Resta |
+|---|---|
+| <img src="Img/Alu_suma.jpeg" alt="Simulación de suma en la ALU" width="400" height="266"> | <img src="Img/Alu_resta.jpeg" alt="Simulación de resta en la ALU" width="400" height="266"> |
 
-#### 1.1 Inclusión de Archivos y Timescale
+| Multiplicación | Comparación |
+|---|---|
+| <img src="Img/Alu_Multip.jpeg" alt="Simulación de multiplicación en la ALU" width="400" height="266"> | <img src="Img/Alu_Comp.jpeg" alt="Simulación de comparación en la ALU" width="400" height="266"> |
 
-```verilog
-`include "[archivo].v"
-`timescale [unidad]/[precisión]
-```
+| Desplazamiento a la izquierda | AND |
+|---|---|
+| <img src="Img/Alu_despl_izq.jpeg" alt="Simulación de desplazamiento a la izquierda en la ALU" width="400" height="266"> | <img src="Img/Alu_AND.jpeg" alt="Simulación de AND en la ALU" width="400" height="266"> |
 
-#### 1.2 Declaración del Módulo y Señales
-
-```verilog
-// [Código]
-```
-
-#### 1.3 Instancia del DUT
-
-```verilog
-// [Código]
-```
-
-#### 1.7 Salida Esperada en Consola
-
-```text
-[Salida esperada]
-```
-
-#### 1.8 Resultados
+| XNOR | NOT A |
+|---|---|
+| <img src="Img/Alu_XNOR.jpeg" alt="Simulación de XNOR en la ALU" width="400" height="266"> | <img src="Img/Alu_NOT_A.jpeg" alt="Simulación de NOT A en la ALU" width="400" height="266"> |
 
 ### 2. Simulación del [banco de registros]
 
-#### 2.1 Inclusión de Archivos y Timescale
-
-```verilog
-`include "[archivo].v"
-`timescale [
-[Salida esperada]
-```
-
-#### 2.7 Diagramas de Simulación
-
-![Descripción](ruta/grafica.png)
-*Figura 2. [Descripción de la gráfica.]*
+![Simulación del banco de registros](Img/Banco_registros.jpeg)
+*Figura 2. Simulación del banco de registros.*
 
 ### 3. Simulación de [UART]
 
-#### 3.1 Verificación mediante Testbench
-
-#### 3.2 Resultado de la Simulación
-
-```text
-[Salida obtenida]
-```
-
-#### 3.3 Posibles Errores y Depuración
-
-```text
-[Errores comunes]
-```
-
-#### 3.4 Diagramas
-
-![Descripción](ruta/grafica1.png)
-*Figura 3. [Descripción de la gráfica.]*
-
-
+![Simulación de las señales del transmisor UART](Img/Uart_tx.jpeg)
+*Figura 3. Simulación de las señales `data`, `start`, `busy`, `rst`, `done` y `tx` del transmisor UART.*
 
 ## Conclusiones
 

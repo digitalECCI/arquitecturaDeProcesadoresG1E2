@@ -1,4 +1,4 @@
-# LabXX - [Título de la práctica]
+# Lab 06: Primer paso con PicoSoC y PicoRV32
 
 # Integrantes
 * [Paula Andrea Cortés](https://github.com/Cortes271) 
